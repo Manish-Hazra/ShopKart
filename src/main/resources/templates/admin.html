@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Admin Panel</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<body class="container">
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#" data-th-href="@{/admin}">Admin Panel</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-danger" data-th-href="@{/logout}" href="#">Logout</a>
+                    </li>
+                </ul>
+                <form class="d-flex">
+                    <input class="form-control me-2" name="q" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+</header>
+<div data-th-if="${param.apparelSuccess}" class="alert alert-success alert-dismissible fade show" role="alert">
+    Apparel Added Successfully!
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<div data-th-if="${param.apparelError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    Apparel Could Not Be Added!
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<main class="container mt-3">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addApparel">
+        Add Apparel
+    </button>
+    <div class="modal fade" tabindex="-1" id="addApparel" aria-labelledby="addApparelModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addApparelModalLabel">Add Apparel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" data-th-action="@{/admin/apparel}" data-th-object="${apparel}">
+                        <div>
+                            <label for="brand-name" class="form-label">Brand Name</label>
+                            <input id="brand-name" class="form-control" data-th-field="*{brandName}"
+                                   placeholder="eg. Adidas TShirt"
+                                   required autofocus="autofocus"/>
+                        </div>
+
+                        <div>
+                            <label for="generic-name" class="form-label">Generic Name</label>
+                            <input id="generic-name" class="form-control" data-th-field="*{genericName}"
+                                   placeholder="eg. TShirt"
+                                   required autofocus="autofocus"/>
+                        </div>
+
+                        <div>
+                            <label for="price" class="form-label">Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">&#8377;</span>
+                                <input id="price" class="form-control" data-th-field="*{price}"
+                                       type="number"
+                                       value="0.00"
+                                       step="0.01"
+                                       min="0"
+                                       required autofocus="autofocus"/>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="gender" class="form-label">Gender</label>
+                            <select id="gender" class="form-select" data-th-field="*{gender}">
+                                <option data-th-each="option : ${T(com.manishhazra.Assignment4.model.Gender).values()}"
+                                        data-th-value="${option}" data-th-text="${option.displayName}"></option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="season" class="form-label">Season</label>
+                            <select id="season" class="form-select" data-th-field="*{season}">
+                                <option data-th-each="option : ${T(com.manishhazra.Assignment4.model.Season).values()}"
+                                        data-th-value="${option}" data-th-text="${option.displayName}"></option>
+                            </select>
+                        </div>
+
+                        <div class="row justify-content-center mt-3">
+                            <button type="submit" class="btn btn-primary">Add Apparel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="container mt-3">
+        <div data-th-if="${apparelList.empty}" class="text-center text-muted">
+            No Apparels Available
+        </div>
+        <div class="row row-cols-lg-4 row-cols-md-3 row-cols-1">
+            <div data-th-each="apparel: ${apparelList}" class="col mb-3">
+                <div class="card" data-th-object="${apparel}">
+                    <div class="card-body">
+                        <h5 class="card-title" data-th-text="*{brandName}">Card title</h5>
+                        <h6 class="card-subtitle mb-2 text-muted" data-th-text="*{genericName}">Generic
+                            Name</h6>
+                        <p class="card-text text-success" data-th-if="${#object.price == #object.discountedPrice}">
+                            <span>&#8377;</span><span data-th-text="*{price}">20.00</span>
+                        </p>
+                        <p class="card-text text-danger" data-th-if="${#object.price != #object.discountedPrice}">
+                            <del><span>&#8377;</span><span data-th-text="*{price}">20.00</span></del>
+                        </p>
+                        <p class="card-text text-success" data-th-if="${#object.price != #object.discountedPrice}">
+                            <span class="">&#8377;</span><span data-th-text="*{discountedPrice}">20.00</span>
+                        </p>
+
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDeal" data-th-if="${apparel.price == apparel.discountedPrice}">
+                            Add Deal
+                        </button>
+
+                        <div class="modal fade" tabindex="-1" id="addDeal" aria-labelledby="addDealModalLabel">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="addDealModalLabel">Add Deal</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="post" data-th-action="@{/admin/deal}" data-th-object="${deal}">
+                                            <input type="hidden" data-th-value="${apparel.id}" name="apparelId">
+                                            <div>
+                                                <label for="percentage" class="form-label">Discount Percentage</label>
+                                                <div class="input-group">
+                                                    <input id="percentage" class="form-control" data-th-field="*{percentage}"
+                                                           type="number"
+                                                           value="0.00"
+                                                           step="0.01"
+                                                           min="0"
+                                                           max="100"
+                                                           required autofocus="autofocus"/>
+                                                    <span class="input-group-text">%</span>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label for="valid-from" class="form-label">Valid From</label>
+                                                <input type="datetime-local" data-th-field="*{validFrom}" id="valid-from" class="form-control">
+                                            </div>
+
+                                            <div>
+                                                <label for="valid-upto" class="form-label">Valid Upto</label>
+                                                <input required type="datetime-local" data-th-field="*{validUpto}" id="valid-upto" class="form-control">
+                                            </div>
+
+
+                                            <div class="row justify-content-center mt-3">
+                                                <button type="submit" class="btn btn-primary">Add Deal</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+</body>
+</html>
